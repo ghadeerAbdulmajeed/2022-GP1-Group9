@@ -15,7 +15,7 @@ This project developed using flutter framework, dart programming language and fi
   <img height="40" width="40" src="https://user-images.githubusercontent.com/25181517/186150304-1568ffdf-4c62-4bdc-9cf1-8d8efcea7c5b.png">
   <img height="40" width="40" src="https://user-images.githubusercontent.com/25181517/186150365-da1eccce-6201-487c-8649-45e9e99435fd.png">
 
-# lanching Instructions 
+# launching Instructions 
  In order to run the code you need the following: 
  ## Prerequisites : 
  - Visual studio code/Android Studio
