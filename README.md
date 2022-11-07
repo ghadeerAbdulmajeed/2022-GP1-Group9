@@ -21,7 +21,7 @@ This project developed using flutter framework, dart programming language and fi
  - Visual studio code/Android Studio
  - Android emulator.
  - Flutter SDK.
- - Stable internet connection -Since we are using cloud Firestone database-
+ - Stable internet connection -Since we are using cloud Firestore database-
  
 ## Installation :
  1. Download VS from https://code.visualstudio.com/  or download Android Studio from  https://developer.android./
