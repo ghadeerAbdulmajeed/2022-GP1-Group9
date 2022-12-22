@@ -5,7 +5,6 @@ class LocalString extends Translations {
   // TODO: implement keys
   Map<String, Map<String, String>> get keys => {
         //English
-        //English
         'en_US': {
           //global
           'signout': 'Sign Out',
@@ -63,15 +62,14 @@ class LocalString extends Translations {
           '  delButton  ': 'Delete',
           'isViolation':
               'Potential violation/s were detected in the video above, Do you agree?',
-          'violationType': 'Violation Type',
+          'violationType': 'Specify the violation types from the list below:',
           'IDK': 'I don\'t know',
-          'addInfo': 'Additional Information',
-          'optinalAddInfo': '(Optional)',
+          'addInfo': 'Additional information',
 
           // pending videos
           'moreText': 'more space for text',
           'PVV': 'Pending Violation Videos',
-          'Watch': 'Watch each video to confirm the violation',
+          'Watch': 'Watch each video to confirm',
           'Select': '\nand select the violation type',
           'VV': 'Violation Video',
           'NPV': 'No Pending Videos',
@@ -80,7 +78,7 @@ class LocalString extends Translations {
 
           //confirmed reports
           'CVR': 'Confirmed Violation Reports',
-          'Send': 'Share your confirmed report\nwith the authorities via email',
+          'Send': 'Share your confirmed report with the authorities via email',
           'VR': 'Violation Report',
           'NVR': 'No Violation Reports',
           'NVRA':
@@ -97,8 +95,8 @@ class LocalString extends Translations {
           'IP': 'Enter your dashcam IP',
           'Link': 'Link',
           'How': 'How do I get my IP address?',
-          'Undo': 'Once you link your dashcam, you cannot edit the IP.',
-          'Sure': 'Are you sure?',
+          'Undo': 'Once you link your dashcam, you can not edit the IP.',
+          "Sure": 'Are you sure?',
           'C': 'Cancel',
           'descSucess': 'Your dashcam has been linked successfully!',
           'descS': 'Your dashcam has been linked successfully!',
@@ -120,7 +118,7 @@ class LocalString extends Translations {
 
           //log in register //changes//
           'passIsNotCorrect':
-              'The password is invalid, or the user does not have am account.',
+              'The password is invalid, or the user does not have a password.',
           'EmailPassError': 'The email or password you entered is incorrect',
           'infoCompletionError': 'Please complete your information',
           'logIn': 'Log in',
@@ -134,7 +132,7 @@ class LocalString extends Translations {
           'pass': 'Password',
           'confPass': 'Confirm Password',
           'noAcc': 'Don\'t have an account?',
-          'alradyAcc': 'Already have an account?',
+          'alradyAcc': 'Alrady have an account?',
           'logToAcc': 'Log in to your Account',
           'noAccountError':
               'There is no user record corresponding to this identifier. The user may have been deleted.',
@@ -205,7 +203,7 @@ class LocalString extends Translations {
           'RPP': 'RASD PRIVACY POLICY',
           'it1': 'ITEM ONE: INTRODUCTION',
           'it1text':
-              'From the principle of the importance and confidentiality of users\' data, RASD administration is committed to maintaining the confidentiality and privacy of user information, and the materials entered by them as a basis for the privacy policy, \nRASD administration will not disclose that information except in accordance with the specific and stipulated controls in this policy, and in accordance with the regulatory provisions issued in this regard.',
+              'From the principle of the importance and confidentiality of users\' data, RASD administration is committed to maintaining the confidentiality and privacy of user information, and the materials entered by them as a baisi for the privacy policy, \nRASD administration will not disclose that information except in accordance with the specific and stipulated controls in this policy, and in accordance with the regulatory provisions issued in this regard.',
           'it2': 'ITEM TWO: USER INFORMATION',
           'it2text':
               'User Data and Information indicates all User’s Data contained in the application such as:\n\n- The personal data used for registration.\n- The dashcam information to detect traffic violations.\n- The violation reports.',
@@ -214,7 +212,7 @@ class LocalString extends Translations {
               'Collecting information in RASD is done by the informations entered from the user and the dashcam to detect traffic violations and then store it in the server specified by the application. ',
           'it4': 'ITEM FOUR:  DATA SHARING',
           'it4text':
-              'The user data may be used, such as traffic violation video links to enhance the model in detecting traffic violations and share the reports with the authorities. ',
+              'The user data may be used, such as traffic violation vedio links to enhance the model in detecting traffic violations and share the reports with the authorities. ',
           'it5': 'ITEM FIVE: APPLICATION ADMINSTRATION',
           'it5text':
               'Name of the entity supervising the application: King Saud University,\nCollege of Computer and Information Sciences,\nInformation Technology Department.',
@@ -234,6 +232,7 @@ class LocalString extends Translations {
           'AreUSureToSave':
               'Are you sure you want to update and save your information? ',
         },
+
         //Arabic
         'ar_AE': {
           //global
@@ -291,12 +290,9 @@ class LocalString extends Translations {
           '  delButton  ': 'حذف',
           'success': 'عملية ناجحة',
           'isViolation': 'تم رصد مخالفات في المقطع أعلاه، هل تراها صحيحة؟',
-          'violationType': 'نوع المخالفة',
+          'violationType': 'حدد نوع المخالفة من القائمة أدناه:',
           'IDK': 'لا أعلم',
           'addInfo': 'معلومات إضافيه',
-          'optinalAddInfo': '(إختياري)',
-          'EditReportHead': 'تعديل التقرير',
-
           //   pending videos
           'moreText': 'مساحة إضافية لكتابة نص',
           'PVV': 'مقاطع قيد المراجعة',
@@ -314,6 +310,7 @@ class LocalString extends Translations {
           'NVR': 'لا يوجد تقارير مخالفات',
           'NVRA': 'يبدو أنه ليس لديك تقارير مخالفات حاليًا',
           'NotSelected': 'لم يتم تحديد نوع المخالفة',
+
           // Edit file
           'successEditing': 'تم تحديث معلومات التقرير بنجاح',
           'confEdit': 'هل انت متأكد من حفظ التغيرات المدخلة',

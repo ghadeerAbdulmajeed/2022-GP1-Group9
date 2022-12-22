@@ -180,6 +180,7 @@ class _accountState extends State<account> {
         dismissOnTouchOutside: false,
         title: 'S'.tr,
         desc: "updateMess".tr,
+        btnOkText: "Ok".tr,
         btnOkOnPress: () {
           if (isEmail) {
             signOut();

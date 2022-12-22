@@ -229,7 +229,7 @@ class _LinkPageState extends State<LinkPage> {
             for (int i = 0; i < 2; i++) {
               // loop to add 2 reports
               final docRepID = docUser.collection('reports').add(
-                {'status': 0, 'v_type': "null", 'id': ''},
+                {'status': 0, 'v_type': "null", 'addInfo': "null", 'id': ''},
               ) //add pending report
                   .then((value) {
                 //updating id to be the same as docID

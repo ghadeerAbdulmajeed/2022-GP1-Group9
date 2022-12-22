@@ -17,6 +17,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:rasd/shared/widgets/url_tex.dart';
 
+import 'EditFile.dart';
+
 class confirmed extends StatefulWidget {
   const confirmed({Key? key}) : super(key: key);
 
@@ -379,16 +381,26 @@ class _confirmedWidgetState extends State<confirmed> {
         .doc(reportDoc.id)
         .get();
     String v_type = '';
+    String addInfo = '';
+    bool thereIsAddInfo = false;
     if (docReport.exists) {
       r = report.fromJsonD(docReport.data()!);
 
       v_type = r.v_type;
+      addInfo = r.addInfo;
+
       if (v_type == "") {
         // if the user did not select any violation type
         v_type = "NotSelected".tr;
       } else {
         //if the user select a violation type
         v_type = v_type.substring(0, v_type.length - 1);
+      }
+
+      if (addInfo == "") {
+        thereIsAddInfo = false;
+      } else {
+        thereIsAddInfo = true;
       }
     }
 
@@ -742,6 +754,63 @@ class _confirmedWidgetState extends State<confirmed> {
                         ),
                       ],
                     ),
+                    //addInfo row***********
+                    thereIsAddInfo
+                        ? pw.TableRow(
+                            children: [
+                              pw.Expanded(
+                                child: pw.Container(
+                                  height: 80,
+                                  padding: pw.EdgeInsets.only(left: 10),
+                                  child: pw.Column(
+                                    crossAxisAlignment:
+                                        pw.CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        pw.MainAxisAlignment.center,
+                                    children: [
+                                      pw.Directionality(
+                                        textDirection: pw.TextDirection.rtl,
+                                        child: pw.Text(
+                                          textAlign: pw.TextAlign.left,
+                                          addInfo,
+                                          style: pw.TextStyle(
+                                            fontSize: 22,
+                                            color: PdfColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              pw.Expanded(
+                                child: pw.Container(
+                                  color: PdfColor.fromHex('#045341'),
+                                  height: 80,
+                                  child: pw.Column(
+                                    crossAxisAlignment:
+                                        pw.CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        pw.MainAxisAlignment.center,
+                                    children: [
+                                      pw.Directionality(
+                                        textDirection: pw.TextDirection.rtl,
+                                        child: pw.Text(
+                                          textAlign: pw.TextAlign.left,
+                                          "addInfo".tr,
+                                          style: pw.TextStyle(
+                                            fontSize: 22,
+                                            color: PdfColors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : pw.TableRow(children: []),
                   ],
                 ),
               ),
@@ -825,7 +894,7 @@ class _confirmedWidgetState extends State<confirmed> {
     String email = '';
     email = user!.email!;
 
-    //Retrive Violation Type
+    //Retrive Violation Type and Additional information
     report r;
     final docReport = await FirebaseFirestore.instance
         .collection("drivers")
@@ -834,9 +903,15 @@ class _confirmedWidgetState extends State<confirmed> {
         .doc(reportDoc.id)
         .get();
     String v_type = '';
+    String addInfo = '';
+    bool thereIsAddInfo =
+        false; // to check if the driver entered addtional information
+
     if (docReport.exists) {
       r = report.fromJsonD(docReport.data()!);
       v_type = r.v_type;
+      addInfo = r.addInfo;
+
       if (v_type == "") {
         // if the user did not select any violation type
         v_type = "NotSelected".tr;
@@ -844,6 +919,17 @@ class _confirmedWidgetState extends State<confirmed> {
         // if the user  select any violation type
         v_type = v_type.substring(0, v_type.length - 1);
       }
+
+      if (addInfo == "") {
+        thereIsAddInfo = false;
+      } else {
+        thereIsAddInfo = true;
+      }
+
+      ///*
+      ///
+      // debugPrint(addInfo + " ///////// ");
+      // debugPrint(v_type + " ----------- ");
     }
 
     final rasdLogo = pw.MemoryImage(
@@ -933,7 +1019,7 @@ class _confirmedWidgetState extends State<confirmed> {
                 color: PdfColors.black,
               ),
               pw.SizedBox(
-                height: 93,
+                height: thereIsAddInfo ? 63 : 93,
               ),
               pw.Container(
                 margin: pw.EdgeInsets.only(left: 10, right: 10),
@@ -1191,10 +1277,66 @@ class _confirmedWidgetState extends State<confirmed> {
                         ),
                       ],
                     ),
+                    //###################more information row##################
+                    thereIsAddInfo
+                        ? pw.TableRow(
+                            children: [
+                              pw.Expanded(
+                                child: pw.Container(
+                                  color: PdfColor.fromHex('#045341'),
+                                  height: 60,
+                                  child: pw.Column(
+                                    crossAxisAlignment:
+                                        pw.CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        pw.MainAxisAlignment.center,
+                                    children: [
+                                      pw.Directionality(
+                                        textDirection: pw.TextDirection.rtl,
+                                        child: pw.Text(
+                                          textAlign: pw.TextAlign.left,
+                                          "addInfo".tr,
+                                          style: pw.TextStyle(
+                                            fontSize: 22,
+                                            color: PdfColors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              pw.Expanded(
+                                child: pw.Container(
+                                  height: 60,
+                                  child: pw.Column(
+                                    crossAxisAlignment:
+                                        pw.CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        pw.MainAxisAlignment.center,
+                                    children: [
+                                      pw.Directionality(
+                                        textDirection: pw.TextDirection.rtl,
+                                        child: pw.Text(
+                                          textAlign: pw.TextAlign.left,
+                                          addInfo,
+                                          style: pw.TextStyle(
+                                            fontSize: 22,
+                                            color: PdfColors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : pw.TableRow(children: []),
                   ],
                 ),
               ),
-              pw.SizedBox(height: 30),
+              pw.SizedBox(height: thereIsAddInfo ? 0 : 30),
               pw.Container(
                 width: 1000,
                 height: 200,
@@ -1267,6 +1409,7 @@ class PreviewScreen extends StatelessWidget {
           dismissOnTouchOutside: false,
           title: 'success'.tr,
           desc: 'Rdelete'.tr,
+          btnOkText: 'Ok'.tr,
           btnOkOnPress: () {
             Navigator.pushReplacement(
                 context,
@@ -1291,6 +1434,7 @@ class PreviewScreen extends StatelessWidget {
           title: 'Sure'.tr,
           desc: 'delConfreport'.tr,
           btnOkText: "yes".tr,
+          btnCancelText: 'C'.tr,
           btnCancelOnPress: () {
             delete = false;
           }, // will stay in the same page
@@ -1393,6 +1537,16 @@ class PreviewScreen extends StatelessWidget {
         canChangePageFormat: false,
         canDebug: false,
         initialPageFormat: PdfPageFormat.a4,
+        scrollViewDecoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: <Color>[
+              Color.fromARGB(255, 255, 255, 255),
+              Color.fromARGB(255, 255, 255, 255)
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         pdfFileName: "filename".tr + ".pdf",
         //##########################################################changes are made here################################
         actions: [
@@ -1405,6 +1559,7 @@ class PreviewScreen extends StatelessWidget {
               UpdateStatus();
             },
           ),
+          //Delete button
           Container(
             padding: EdgeInsets.only(top: 8),
             child: GestureDetector(
@@ -1418,10 +1573,30 @@ class PreviewScreen extends StatelessWidget {
               },
             ),
           ),
+          //Edit button
+          Container(
+            padding: EdgeInsets.only(top: 8),
+            child: GestureDetector(
+              child: Icon(
+                Icons.edit,
+                color: Colors.white,
+                size: 30,
+              ),
+              onTap: () async {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EditFile(
+                              reportDocid: ReportdocID,
+                              userDocid: UserdocID,
+                            )));
+              },
+            ),
+          ),
         ],
         //loading
         loadingWidget: Container(
-          padding: EdgeInsets.only(bottom: 50, top: 50),
+          padding: EdgeInsets.only(bottom: 50, top: 200),
           child: Column(
             children: [
               Stack(alignment: Alignment.center, children: [
@@ -1442,15 +1617,15 @@ class PreviewScreen extends StatelessWidget {
                   ),
                 ),
               ]),
-              Container(
-                height: 50,
-                padding: EdgeInsets.only(right: 6, top: 0),
-                child: Image.asset(
-                  'assets/images/rasdTextBlack.png', //make it pop up
-                  height: 105,
-                  width: 105,
-                ),
-              ),
+              // Container(
+              //   height: 50,
+              //   padding: EdgeInsets.only(right: 6, top: 0),
+              //   child: Image.asset(
+              //     'assets/images/rasdTextBlack.png', //make it pop up
+              //     height: 105,
+              //     width: 105,
+              //   ),
+              // ),
               SizedBox(
                 height: 10,
               ),
