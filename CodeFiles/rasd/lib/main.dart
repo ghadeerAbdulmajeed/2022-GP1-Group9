@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rasd/shared/LocalString.dart';
 import 'package:rasd/Splash.dart';
+import 'package:rasd/streamVidHome.dart';
 import 'package:rasd/shared/GlobalColors.dart';
 
 Future<void> main() async {
@@ -27,6 +28,8 @@ class MyApp extends StatelessWidget {
           unselectedWidgetColor: GlobalColors.mainColorGreen,
           fontFamily: 'Tajawal'),
       home: Splash(),
+      // home: LiveStreamScreen(
+      //     url: 'rtsp://admin:LDOCUY@192.168.3.53:554/ch1/main'),
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:rasd/shared/padding.dart';
 import 'package:rasd/model/report.dart';
 import 'package:rasd/shared/GlobalColors.dart';
 import 'package:rasd/pages/linkDashCam.dart';
+import 'package:rasd/streamVidHome.dart';
 import '../model/driver.dart';
 
 class HomePage extends StatefulWidget {
@@ -251,7 +252,7 @@ class _HomePageState extends State<HomePage> {
 
                 Expanded(
                   //inside this expanded you should put your page code
-                  child: _listView(driver.dashcam_id),
+                  child: _listView(driver, driver.dashcam_id),
                 ),
               ],
             ),
@@ -261,7 +262,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _listView(String dashID) {
+  Widget _listView(Driver driver, String dashID) {
     var size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: spacer),
@@ -269,10 +270,10 @@ class _HomePageState extends State<HomePage> {
         SizedBox(height: 15),
 
         //_linkButton(),
-        buildLinkingCard(dashID),
+        buildLinkingCard(driver, dashID),
         buildPendingCard(),
         buildConfirmedCard(),
-        //   _signOutButton()
+        //_signOutButton()
       ]),
     );
   }
@@ -628,7 +629,8 @@ class _HomePageState extends State<HomePage> {
   }
 
 //##########################################bluid linking card ########################################################
-  Container buildLinkingCard(String dashID) {
+  Container buildLinkingCard(Driver driver, String dashID) {
+    var RTSPurl = driver.rtsp_url;
     final uid1 = user!.uid.toString();
     return dashID != 'null'
         ? Container(
@@ -669,7 +671,7 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Container(
-                        padding: EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.only(top: 1),
                         child: RichText(
                           text: TextSpan(
                             children: [
@@ -697,30 +699,96 @@ class _HomePageState extends State<HomePage> {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 30),
+                          horizontal: 15, vertical: 5),
                       alignment:
                           arLnag ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Stack(
-                        alignment: AlignmentDirectional.center,
+                      // child: Stack(
+                      //   alignment: AlignmentDirectional.center,
+                      //   children: [
+                      //     Container(
+                      //       child: ShaderMask(
+                      //         shaderCallback: (bounds) => LinearGradient(
+                      //           begin: Alignment.topLeft,
+                      //           end: Alignment.bottomRight,
+                      //           colors: [
+                      //             GlobalColors.mainColorGreen,
+                      //             GlobalColors.secondaryColorGreen,
+                      //           ],
+                      //           tileMode: TileMode.clamp,
+                      //         ).createShader(bounds),
+                      //         child: Icon(
+                      //           Icons.linked_camera_outlined,
+                      //           size: 90,
+                      //           color: Colors.white,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                      child: Column(
                         children: [
-                          Container(
-                            child: ShaderMask(
-                              shaderCallback: (bounds) => LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  GlobalColors.mainColorGreen,
-                                  GlobalColors.secondaryColorGreen,
-                                ],
-                                tileMode: TileMode.clamp,
-                              ).createShader(bounds),
-                              child: Icon(
-                                Icons.linked_camera_outlined,
-                                size: 90,
-                                color: Colors.white,
+                          Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(3),
+                                      border: Border.all(
+                                        width: 3,
+                                        color: GlobalColors.secondaryColorGreen,
+                                      )
+                                      // border: Border(
+                                      //   bottom: BorderSide(
+                                      //       width: 10,
+                                      //       color: GlobalColors.secondaryColorGreen),
+                                      //   top: BorderSide(
+                                      //     width: 10,
+                                      //     color: GlobalColors.secondaryColorGreen,
+                                      //   ),
+                                      // ),
+                                      ),
+                                  height: 56.2,
+                                  width: 100,
+                                  child: LiveStreamScreen(
+                                    url: RTSPurl,
+                                    uid: uid1,
+                                    recordStream: true,
+                                  ),
+                                ),
+                              ]),
+                          Stack(
+                            alignment: AlignmentDirectional.center,
+                            children: [
+                              Container(
+                                height: 25,
+                                width: 25,
+                                decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        colors: [
+                                          GlobalColors.mainColorGreen,
+                                          GlobalColors.secondaryColorGreen
+                                        ]),
+                                    borderRadius: BorderRadius.circular(100)),
                               ),
-                            ),
-                          ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => RootApp(
+                                                pageIndex: 0,
+                                              )));
+                                },
+                                child: Icon(
+                                  Icons.restart_alt_rounded,
+                                  size: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -730,8 +798,8 @@ class _HomePageState extends State<HomePage> {
                           : Alignment.bottomRight, // *
                       padding: EdgeInsets.only(
                           left: arLnag ? 5 : 0,
-                          right: 5,
-                          bottom: arLnag ? 5 : 5),
+                          right: 10,
+                          bottom: arLnag ? 5 : 15),
                       child: Container(
                         //alignment: Alignment.bottomRight,
                         //padding: const EdgeInsets.only(left: 0, right: 2),

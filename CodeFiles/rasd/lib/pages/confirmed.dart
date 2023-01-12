@@ -1583,7 +1583,7 @@ class PreviewScreen extends StatelessWidget {
                 size: 30,
               ),
               onTap: () async {
-                Navigator.pushReplacement(
+                Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => EditFile(

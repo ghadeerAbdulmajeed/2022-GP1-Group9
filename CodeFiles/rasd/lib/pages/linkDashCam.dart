@@ -1,10 +1,15 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rasd/appRoot.dart';
 import 'package:rasd/shared/GlobalColors.dart';
 import 'package:rasd/shared/textFormGlobal.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:rasd/streamStatucCheck.dart';
+import 'package:rasd/streamVidLink.dart';
 
 class LinkPage extends StatefulWidget {
   @override
@@ -17,15 +22,34 @@ class LinkPage extends StatefulWidget {
 }
 
 class _LinkPageState extends State<LinkPage> {
-  final GlobalKey<FormState> _formKeyLink = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKeyLink =
+      GlobalKey<FormState>(); //for ip only
+  final GlobalKey<FormState> _formKeyLink2 =
+      GlobalKey<FormState>(); //for ip,admin, and pass
   final TextEditingController Dashcam_id = TextEditingController();
+  final TextEditingController Dashcam_username = TextEditingController();
+  final TextEditingController Dashcam_pass = TextEditingController();
+
   String? errorMessage = '';
   bool isLogin = true;
   String dashcam_id_num = "";
+  String dashcam_un = "";
+  String dashcam_ps = "";
   String? errorMessageData = '';
   String? errorMessageValid = '';
   bool isDataBasEerrorMessage = true;
   bool arLnag = "IP".tr == 'Enter your dashcam IP' ? false : true;
+  String url = "http://127.0.0.1:5000/dashcam_id_num";
+  String RTSPurl = '';
+  var ipOnly = 1; //0 no, 1 yes
+  bool? live;
+  Timer? streamUpdate;
+
+  @override
+  void dispose() {
+    streamUpdate?.cancel();
+    super.dispose();
+  }
 
   Widget _errorMessage() {
     return Text(
@@ -100,8 +124,8 @@ class _LinkPageState extends State<LinkPage> {
             child: TextButton(
               //clicking on link
               onPressed: () {
-                bool validate = checkValidation(_formKeyLink);
-
+                bool validate =
+                    checkValidation(ipOnly == 1 ? _formKeyLink : _formKeyLink2);
                 if (validate) {
                   // after clicking on link the user must confirm --> call confirmation dialog
                   _showMyDialog('editMess'.tr);
@@ -149,7 +173,8 @@ class _LinkPageState extends State<LinkPage> {
                 ]),
             child: TextButton(
               onPressed: () {
-                bool validate = checkValidation(_formKeyLink);
+                bool validate =
+                    checkValidation(ipOnly == 1 ? _formKeyLink : _formKeyLink2);
                 if (validate) {
                   _showMyDialog('linkMess'.tr);
                 }
@@ -176,7 +201,7 @@ class _LinkPageState extends State<LinkPage> {
   } //submitButton
 
   //################## sucess dialog ##################
-  void _showSucess() {
+  Future<void> _showSucess() async {
     AwesomeDialog(
         context: context,
         btnCancelColor: Colors.grey,
@@ -198,72 +223,142 @@ class _LinkPageState extends State<LinkPage> {
   }
 
   //################## confirmation dialog ##################
-  Future<void> _showMyDialog(String desctr) async {
+  Future<void> _showMyDialog(String desctr) {
+    var ip = Dashcam_id.text;
+    var username = Dashcam_username.text;
+    var pass = Dashcam_pass.text;
+    var data = utf8.encode(pass); // data being hashed (dashcam password)
+    var hashvalue = sha1.convert(data);
+    if (ipOnly == 1) {
+      RTSPurl = 'rtsp://$ip:554/livestream/12';
+    } else {
+      RTSPurl = 'rtsp://$username:$pass@$ip:554';
+    }
+    print(RTSPurl);
+    streamUpdate = Timer.periodic(Duration(seconds: 1), (_) {
+      live = streamCheck.statCheckLink.value;
+      print('Live---------$live');
+    });
+
     return AwesomeDialog(
       context: context,
+      body: Builder(builder: (context) {
+        return Center(
+            child: Column(children: [
+          const Center(
+              child: Text(
+            'Can you see the stream?',
+            style: TextStyle(
+              fontSize: 15,
+            ),
+          )),
+          Container(
+              decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+              height: 90,
+              width: 163,
+              child: LiveStreamScreenLink(
+                url: RTSPurl,
+                uid: widget.uid,
+                recordStream: false,
+              ))
+        ]));
+      }),
       btnCancelColor: Colors.grey,
       btnOkColor: GlobalColors.secondaryColorGreen,
       dialogType: DialogType.info,
       animType: AnimType.scale,
-      title: 'Sure'.tr,
-      desc: desctr,
+      //title: 'Sure'.tr,
+      //desc: desctr,
       btnOkText: 'yes'.tr,
-      btnCancelText: 'C'.tr,
-
+      btnCancelText: 'No'.tr,
       btnCancelOnPress: () {}, // will stay in the same page
       btnOkOnPress: () {
-        //################## check  dashcam IP is in the right form ##################
-        bool validate = checkValidation(_formKeyLink);
-        if (validate) {
-          dashcam_id_num = Dashcam_id.text; //
-          final docUser =
-              FirebaseFirestore.instance.collection('drivers').doc(widget.uid);
-          //################## now add dashcam IP after validation ##################
-          //update specfic fields
-          docUser.update({
-            'dashcam_id': dashcam_id_num,
-          });
-
-          //############### Add dummy data (add 2 pending videos) for new users ##################
-          if (widget.linked == false) {
-            for (int i = 0; i < 2; i++) {
-              // loop to add 2 reports
-              final docRepID = docUser.collection('reports').add(
-                {'status': 0, 'v_type': "null", 'addInfo': "null", 'id': ''},
-              ) //add pending report
-                  .then((value) {
-                //updating id to be the same as docID
-                docUser
-                    .collection('reports')
-                    .doc(value.id)
-                    .update({'id': value.id.toString()});
-                //add video
-                docUser
-                    .collection('reports')
-                    .doc(value.id)
-                    .collection('video')
-                    .add(
-                  {
-                    'video_url': i == 0
-                        ? "https://firebasestorage.googleapis.com/v0/b/rasd-23356.appspot.com/o/videos%2FDashcamksa1-1210158521297391616-20191226_142049-vid1.mp4?alt=media&token=25723901-1cc7-4700-bc55-d6145dad5ae3" //video number 1
-                        : 'https://firebasestorage.googleapis.com/v0/b/rasd-23356.appspot.com/o/videos%2FDashcamksa1-1211035288631496708-20191229_002447-vid1.mp4?alt=media&token=a65e5fcd-73ae-4a9a-8455-8e7d53956af3', //video number 2
-                    'id': ''
-                  }, //add video inside it
-                ).then((value2) => docUser
-                        .collection('reports')
-                        .doc(value.id)
-                        .collection('video')
-                        .doc(value2.id)
-                        .update({'id': value2.id.toString()}));
+        print('Live---------$live');
+        if (!live!) {
+          //if stream is not avialable
+          AwesomeDialog(
+                  context: context,
+                  btnCancelColor: Colors.grey,
+                  btnOkColor: GlobalColors.secondaryColorGreen,
+                  dialogType: DialogType.error,
+                  animType: AnimType.scale,
+                  dismissOnTouchOutside: false,
+                  title: 'Error',
+                  desc:
+                      'an error happened while retrieving the stream from the dashcam, please make sure of the entered information',
+                  btnOkText: 'Ok'.tr,
+                  btnOkOnPress: () {})
+              .show();
+          streamUpdate!.cancel();
+        } else {
+          //if the stream is availabe
+          //################## check  dashcam IP is in the right form ##################
+          bool validate =
+              checkValidation(ipOnly == 1 ? _formKeyLink : _formKeyLink2);
+          if (validate) {
+            dashcam_id_num = Dashcam_id.text;
+            if (ipOnly == 0) {
+              dashcam_un = Dashcam_username.text;
+              dashcam_ps = hashvalue.toString();
+            }
+            final docUser = FirebaseFirestore.instance
+                .collection('drivers')
+                .doc(widget.uid);
+            //################## now add dashcam IP after validation ##################
+            //update specfic fields
+            docUser.update({
+              'dashcam_id': dashcam_id_num,
+              'rtsp_url': RTSPurl,
+            });
+            if (ipOnly == 0) {
+              docUser.update({
+                'dashcam_username': dashcam_un,
+                'dashcam_pass': dashcam_ps,
               });
             }
+            // //############### Add dummy data (add 2 pending videos) for new users ##################
+            // if (widget.linked == false) {
+            //   for (int i = 0; i < 2; i++) {
+            //     // loop to add 2 reports
+            //     final docRepID = docUser.collection('reports').add(
+            //       {'status': 0, 'v_type': "null", 'addInfo': "null", 'id': ''},
+            //     ) //add pending report
+            //         .then((value) {
+            //       //updating id to be the same as docID
+            //       docUser
+            //           .collection('reports')
+            //           .doc(value.id)
+            //           .update({'id': value.id.toString()});
+            //       //add video
+            //       docUser
+            //           .collection('reports')
+            //           .doc(value.id)
+            //           .collection('video')
+            //           .add(
+            //         {
+            //           'video_url': i == 0
+            //               ? 'https://firebasestorage.googleapis.com/v0/b/rasd-d3906.appspot.com/o/Videos%2F3la_altreq-1262081362107998209-20200517_210339-vid1.mp4?alt=media&token=b5b68317-d098-476f-88a5-259d61a93b2b' //video number 1
+            //               : 'https://firebasestorage.googleapis.com/v0/b/rasd-d3906.appspot.com/o/Videos%2FAnwsanws-1542158155622268928-20220629_174850-vid1.mp4?alt=media&token=996f0025-745a-45ba-93da-7b543f287e72', //video number 2
+            //           'id': ''
+            //         }, //add video inside it
+            //       ).then((value2) => docUser
+            //               .collection('reports')
+            //               .doc(value.id)
+            //               .collection('video')
+            //               .doc(value2.id)
+            //               .update({'id': value2.id.toString()}));
+            //     });
+            //   }
+            // }
+            //#####################pass it to python#################
+            _showSucess();
+            streamUpdate!.cancel();
+          } else {
+            setState(() {
+              errorMessageValid = 'errorLink'.tr;
+              streamUpdate!.cancel();
+            });
           }
-
-          _showSucess();
-        } else {
-          setState(() {
-            errorMessageValid = 'errorLink'.tr;
-          });
         }
       },
     ).show();
@@ -273,7 +368,11 @@ class _LinkPageState extends State<LinkPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text(''),
+          title: Container(
+            child: Text(
+                widget.linked ? 'Edit your Dashcam IP' : 'Link your Dashcam',
+                style: TextStyle(color: GlobalColors.mainColorGreen)),
+          ),
           backgroundColor: Colors.white,
           leading: IconButton(
             icon: const Icon(
@@ -285,7 +384,12 @@ class _LinkPageState extends State<LinkPage> {
               Navigator.pop(context);
             },
           )),
-      body: widget.linked ? edit() : Link(),
+      body: ValueListenableBuilder(
+        valueListenable: streamCheck.statCheckLink,
+        builder: (context, value, child) {
+          return widget.linked ? edit() : Link();
+        },
+      ),
     );
   }
 
@@ -293,42 +397,127 @@ class _LinkPageState extends State<LinkPage> {
     return SingleChildScrollView(
       child: SafeArea(
         child: Container(
-            //color: Colors.brown,
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 50),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 80),
+                SizedBox(height: ipOnly == 1 ? 80 : 40),
                 Container(
                     alignment: Alignment.center,
                     child: Image.asset('assets/images/logo.png',
                         height: 130, width: 130)),
                 const SizedBox(height: 40),
-
                 Text(
-                  'LTOAPP'.tr,
+                  'What type of RTSP link your dashcam provides?',
                   style: TextStyle(
                     color: GlobalColors.textColor,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 20),
-                // Fname input
-                Form(
-                    key: _formKeyLink,
-                    child: Column(
-                      children: [
-                        TextFormGlobal(
-                          controller: Dashcam_id,
-                          text: 'IP'.tr,
-                          obsecure: false,
-                          textInputType: TextInputType.text,
-                          isLogin: true,
-                        ),
-                      ],
-                    )),
+                Container(
+                  child: Row(children: [
+                    Expanded(
+                        flex: 3,
+                        child: Row(children: [
+                          Radio(
+                            activeColor: GlobalColors.mainColorGreen,
+                            value: 1, //IP only
+                            groupValue: ipOnly,
+                            onChanged: ((value) {
+                              setState(() {
+                                ipOnly = value!;
+                                Dashcam_id.clear();
+                              });
+                            }),
+                          ),
+                          Container(
+                              padding: EdgeInsets.only(top: 5),
+                              child: Text(
+                                'IP only',
+                                style: TextStyle(
+                                  color: GlobalColors.textColor,
+                                  fontSize: 15,
+                                ),
+                              ))
+                        ])),
+                    Expanded(
+                        flex: 5,
+                        child: Row(children: [
+                          Radio(
+                            activeColor: GlobalColors.mainColorGreen,
+                            value: 0, //IP, Admin, Pass
+                            groupValue: ipOnly,
+                            onChanged: ((value) {
+                              setState(() {
+                                ipOnly = value!;
+                                Dashcam_id.clear();
+                              });
+                            }),
+                          ),
+                          Container(
+                              padding: EdgeInsets.only(top: 5),
+                              child: Text(
+                                'IP, username, and \npassword required',
+                                style: TextStyle(
+                                  color: GlobalColors.textColor,
+                                  fontSize: 15,
+                                ),
+                              ))
+                        ])),
+                  ]),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                ipOnly == 1
+                    ? Form(
+                        key: _formKeyLink,
+                        child: Column(
+                          children: [
+                            TextFormGlobal(
+                              controller: Dashcam_id,
+                              text: 'IP'.tr,
+                              obsecure: false,
+                              textInputType: TextInputType.text,
+                              isLogin: true,
+                            ),
+                          ],
+                        ))
+                    : Form(
+                        key: _formKeyLink2,
+                        child: Column(
+                          children: [
+                            TextFormGlobal(
+                              controller: Dashcam_id,
+                              text: 'IP'.tr,
+                              obsecure: false,
+                              textInputType: TextInputType.text,
+                              isLogin: true,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            TextFormGlobal(
+                              controller: Dashcam_username,
+                              text: 'Enter your dashcam Username',
+                              obsecure: false,
+                              textInputType: TextInputType.text,
+                              isLogin: true,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            TextFormGlobal(
+                              controller: Dashcam_pass,
+                              text: 'Enter your dashcam Password',
+                              obsecure: false,
+                              textInputType: TextInputType.text,
+                              isLogin: true,
+                            ),
+                          ],
+                        )),
                 const SizedBox(height: 0),
                 Center(
                   child: Row(
@@ -359,36 +548,122 @@ class _LinkPageState extends State<LinkPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 80),
+                SizedBox(height: ipOnly == 1 ? 80 : 40),
                 Container(
                     alignment: Alignment.center,
                     child: Image.asset('assets/images/logo.png',
                         height: 130, width: 130)),
                 const SizedBox(height: 40),
-
                 Text(
-                  'editDashCam'.tr,
+                  'What type of RTSP link your dashcam provides?',
                   style: TextStyle(
                     color: GlobalColors.textColor,
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 20),
-                // Fname input
-                Form(
-                    key: _formKeyLink,
-                    child: Column(
-                      children: [
-                        TextFormGlobal(
-                          controller: Dashcam_id,
-                          text: 'IP'.tr,
-                          obsecure: false,
-                          textInputType: TextInputType.text,
-                          isLogin: true,
-                        ),
-                      ],
-                    )),
+                Container(
+                  child: Row(children: [
+                    Expanded(
+                        flex: 3,
+                        child: Row(children: [
+                          Radio(
+                            activeColor: GlobalColors.mainColorGreen,
+                            value: 1, //IP only
+                            groupValue: ipOnly,
+                            onChanged: ((value) {
+                              setState(() {
+                                ipOnly = value!;
+                                Dashcam_id.clear();
+                              });
+                            }),
+                          ),
+                          Container(
+                              padding: EdgeInsets.only(top: 5),
+                              child: Text(
+                                'IP only',
+                                style: TextStyle(
+                                  color: GlobalColors.textColor,
+                                  fontSize: 15,
+                                ),
+                              ))
+                        ])),
+                    Expanded(
+                        flex: 5,
+                        child: Row(children: [
+                          Radio(
+                            activeColor: GlobalColors.mainColorGreen,
+                            value: 0, //IP, Admin, Pass
+                            groupValue: ipOnly,
+                            onChanged: ((value) {
+                              setState(() {
+                                ipOnly = value!;
+                                Dashcam_id.clear();
+                              });
+                            }),
+                          ),
+                          Container(
+                              padding: EdgeInsets.only(top: 5),
+                              child: Text(
+                                'IP, username, and \npassword required',
+                                style: TextStyle(
+                                  color: GlobalColors.textColor,
+                                  fontSize: 15,
+                                ),
+                              ))
+                        ])),
+                  ]),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                ipOnly == 1
+                    ? Form(
+                        key: _formKeyLink,
+                        child: Column(
+                          children: [
+                            TextFormGlobal(
+                              controller: Dashcam_id,
+                              text: 'IP'.tr,
+                              obsecure: false,
+                              textInputType: TextInputType.text,
+                              isLogin: true,
+                            ),
+                          ],
+                        ))
+                    : Form(
+                        key: _formKeyLink2,
+                        child: Column(
+                          children: [
+                            TextFormGlobal(
+                              controller: Dashcam_id,
+                              text: 'IP'.tr,
+                              obsecure: false,
+                              textInputType: TextInputType.text,
+                              isLogin: true,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            TextFormGlobal(
+                              controller: Dashcam_username,
+                              text: 'Enter your dashcam Username',
+                              obsecure: false,
+                              textInputType: TextInputType.text,
+                              isLogin: true,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            TextFormGlobal(
+                              controller: Dashcam_pass,
+                              text: 'Enter your dashcam Password',
+                              obsecure: false,
+                              textInputType: TextInputType.text,
+                              isLogin: true,
+                            ),
+                          ],
+                        )),
                 const SizedBox(height: 0),
                 Center(
                   child: Row(

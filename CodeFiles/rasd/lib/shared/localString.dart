@@ -23,7 +23,7 @@ class LocalString extends Translations {
           'pendVidNum2': ' pending videos',
           'viewButton': 'View',
           'DLS': 'Dashcam Linked Successfully\n',
-          'DLSA': 'The IP address of the linked dashcam:',
+          'DLSA': 'The IP address of the linked dashcam:\n',
           'ConfRep': 'Confirmed Reports\n',
           'noConfirmed': 'Currently there are no confirmed reports',
           'confRepNum1': 'Number of confirmed reports:',

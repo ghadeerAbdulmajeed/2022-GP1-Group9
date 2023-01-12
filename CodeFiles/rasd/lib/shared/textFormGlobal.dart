@@ -40,6 +40,12 @@ class TextFormGlobal extends StatelessWidget {
     }
   }
 
+// need more vaildtion
+  bool validatePhoneNumber(value) {
+    final phoneRegExp = RegExp(r"^\+?05[0-9]{8}$");
+    return phoneRegExp.hasMatch(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool? arLnag =
@@ -118,6 +124,21 @@ class TextFormGlobal extends StatelessWidget {
                   return 'enterDIP'.tr;
                 } else if (!validator.ip(val)) {
                   return 'ipForm'.tr;
+                }
+              } else if (text == 'Enter your dashcam Password') {
+                if (val!.isEmpty) {
+                  return 'Enter your dashcam Password';
+                }
+              } else if (text == 'Enter your dashcam Username') {
+                if (val!.isEmpty) {
+                  return 'Enter your dashcam Username';
+                }
+              } //phone number vailditionkk
+              else if (text == 'Phone Number') {
+                if (val!.isEmpty) {
+                  return 'Enter your phone number';
+                } else if (!validatePhoneNumber(val)) {
+                  return 'invalid phone number';
                 }
               }
             },

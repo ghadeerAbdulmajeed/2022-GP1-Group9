@@ -13,8 +13,6 @@ String checkedViolation = "";
 final _AdditionalInfo = TextEditingController();
 
 class showVideo extends StatefulWidget {
-  // const showVideo({Key? key}) : super(key: key);
-
   const showVideo(
       {super.key, required this.reportDocid, required this.userDocid});
   final String reportDocid;
@@ -48,8 +46,6 @@ class _showVideoState extends State<showVideo> {
         .then((QuerySnapshot querySnapshot) => {
               querySnapshot.docs.forEach((doc) {
                 video_url = doc["video_url"];
-                // video_url =
-                //     'https://firebasestorage.googleapis.com/v0/b/rasd-d3906.appspot.com/o/Videos%2F3la_altreq-1262081362107998209-20200517_210339-vid1.mp4?alt=media&token=b5b68317-d098-476f-88a5-259d61a93b2b';
                 final controller = VideoPlayerController.network(video_url);
 
                 _controller = controller;
@@ -201,7 +197,7 @@ class _showVideoState extends State<showVideo> {
               await doc.reference.delete();
             }
 
-            // reportDoc.delete(); // delete report
+            reportDoc.delete(); // delete report
             if (_misclassifidied) {
               //here we want to save the video in another collection for enha model
               final missClassVideo = video(video_url: video_url);
@@ -213,8 +209,8 @@ class _showVideoState extends State<showVideo> {
 
               ///create document and write data to firebase
               await docMisV.set(json);
-              _showSucess("delConfirmation".tr, 1);
             }
+            _showSucess("delConfirmation".tr, 1);
           }
         }).show();
   }
@@ -785,7 +781,7 @@ class _showVideoState extends State<showVideo> {
                                     ),
                                     onPressed: () {
                                       _value == 1
-                                          ? _showMyDialogDelete(true)
+                                          ? _showMyDialogDelete(false)
                                           : _showMyDialogDelete(true);
                                     },
                                     child: Row(

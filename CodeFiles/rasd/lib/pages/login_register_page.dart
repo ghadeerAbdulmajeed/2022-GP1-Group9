@@ -22,6 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKeylogIn = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKeySignUp = GlobalKey<FormState>();
   final TextEditingController emilController = TextEditingController();
+  final TextEditingController PhoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController passwordController2 = TextEditingController();
   final TextEditingController firstNameController = TextEditingController();
@@ -127,8 +128,13 @@ class _LoginPageState extends State<LoginPage> {
             Fname: firstNameController.text,
             Lname: lastNameController.text,
             dashcam_id: 'null', //later
+            dashcam_username: 'null',
+            dashcam_pass: 'null',
+            rtsp_url: 'null',
             email: emilController.text,
             hash_pass: hashvalue.toString(),
+            phone_number: PhoneController.text,
+            phoneVerfied: false, // the phone number has not been verfied
           ));
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -156,6 +162,7 @@ class _LoginPageState extends State<LoginPage> {
     firstNameController.clear();
     lastNameController.clear();
     passwordController2.clear();
+    PhoneController.clear();
   }
 
   Widget _CompleteAgreemntMssg() {
@@ -675,8 +682,16 @@ class _LoginPageState extends State<LoginPage> {
                             textInputType: TextInputType.emailAddress,
                             isLogin: false,
                           ),
+                          //####################Phone number ####################//
                           const SizedBox(height: 15),
-
+                          TextFormGlobal(
+                            controller: PhoneController,
+                            text: 'Phone Number',
+                            obsecure: false,
+                            textInputType: TextInputType.number,
+                            isLogin: false,
+                          ),
+                          const SizedBox(height: 15),
                           // Password input
                           Stack(
                             alignment: Alignment.center,

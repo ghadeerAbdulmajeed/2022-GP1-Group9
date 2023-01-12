@@ -8,6 +8,8 @@ import 'package:rasd/appRoot.dart';
 import 'package:rasd/shared/GlobalColors.dart';
 import 'package:rasd/model/driver.dart';
 
+//import '../otp.dart';
+
 class account extends StatefulWidget {
   final String uid;
 
@@ -28,6 +30,7 @@ class _accountState extends State<account> {
   bool arLnag = "acc".tr == 'My Account' ? false : true;
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
+  TextEditingController PhoneNumberController = TextEditingController();
   TextEditingController userNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController oldEmailController = TextEditingController();
@@ -360,13 +363,15 @@ class _accountState extends State<account> {
     firstNameController.dispose();
     lastNameController.dispose();
     emailController.dispose();
+    PhoneNumberController.dispose();
     super.dispose();
   }
 
   void _getLatestValue() {
     if (firstNameController.text == '' &&
         lastNameController.text == '' &&
-        emailController.text == '') {
+        emailController.text == '' &&
+        PhoneNumberController.text == '') {
       isFormEmpty = true;
     } else {
       isFormEmpty = false;
@@ -387,7 +392,7 @@ class _accountState extends State<account> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: const Text(
-              "", // there must be a back button
+              "",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
@@ -395,7 +400,9 @@ class _accountState extends State<account> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 39),
             width: 380,
-            height: 450,
+            height: 502,
+
+            ///*********** edit  */
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 color: Colors.white,
@@ -422,6 +429,21 @@ class _accountState extends State<account> {
                           height: 20,
                         ),
                         textField("em".tr, driver.email, emailController),
+                        const SizedBox(
+                          height: 20, // edit
+                        ),
+                        //***********Phone number ****************/
+                        textField('Phone number', driver.phone_number,
+                            PhoneNumberController),
+                        !driver.phoneVerfied
+                            ? TextButton(
+                                style: TextButton.styleFrom(
+                                  textStyle: const TextStyle(fontSize: 10),
+                                ),
+                                onPressed: () {},
+                                child: const Text('Verfiy'),
+                              )
+                            : Container(),
                       ],
                     )),
               ],
