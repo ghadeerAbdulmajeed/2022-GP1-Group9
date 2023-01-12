@@ -37,7 +37,9 @@ This project developed using flutter framework, dart programming language and fi
 
 ## Resourses :
 The attached object detection model and training model were inspired by this repository:
+
 https://github.com/chandran-jr/Violence-Alert-System
+
 The code was modified as needed to suit the requirements of RASD.
 
 
