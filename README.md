@@ -30,7 +30,7 @@ This project developed using flutter framework, dart programming language and fi
  4. Download Flutter SDK from https://docs.flutter.dev/get-started/install 
  
 ## Start Running the code :
-1. import the code in VS/Android studio.
+1. Import the code in VS/Android studio.
 2. Run the emulator.
 3. Run the code.
 4. Sign up to the application or log in using the provided credentials. 
